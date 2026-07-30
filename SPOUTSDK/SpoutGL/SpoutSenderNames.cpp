@@ -114,6 +114,8 @@
 	22.01.26 - Add "using namespace spoututils" to header
 			   Review - update copyright year
 	16.07.26 - move using namespace spoututils from header to class file
+	30.07.26 - readSenderSetFromBuffer -
+			   Cast name to unsigned char to allow for non-ASCII characters
 	
 	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	Copyright (c) 2014-2026, Lynn Jarvis. All rights reserved.
@@ -1072,7 +1074,8 @@ void spoutSenderNames::readSenderSetFromBuffer(const char* buffer, std::set<std:
 		SenderNames.erase (SenderNames.begin(), SenderNames.end() );
 	}
 
-	char name[SpoutMaxSenderNameLen]={};		// char array to test for nulls
+	// char array to test for nulls
+	char name[SpoutMaxSenderNameLen]={};
 	int i = 0;
 	do {
 		// the actual string retrieved from shared memory should terminate
@@ -1080,10 +1083,8 @@ void spoutSenderNames::readSenderSetFromBuffer(const char* buffer, std::set<std:
 		// At the end of the map there will be a null in the data.
 		// Must use a character array to ensure testing for null.
 		strncpy_s(name, buf, SpoutMaxSenderNameLen);
-		// Cast to unsigned char before the comparison. char is signed on MSVC, so a
-		// name whose first byte is >= 0x80 (e.g. a UTF-8 / non-ASCII sender name) is
-		// negative and would be dropped here, and would also end the loop early and
-		// hide any senders stored after it.
+		// Cast to unsigned char to allow for non-ASCII characters
+		// https://github.com/leadedge/Spout2/pull/141
 		if((unsigned char)name[0] > 0) {
 			// insert name into set
 			SenderNames.insert(&name[0]);
