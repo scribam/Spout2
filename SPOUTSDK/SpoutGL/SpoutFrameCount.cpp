@@ -449,7 +449,6 @@ std::string spoutFrameCount::GetSenderName()
 void spoutFrameCount::HoldFps(double fps)
 {
 	// Unlikely but return anyway
-	// if (fps <= 0)
 	if (fps <= 0.0)
 		return;
 
