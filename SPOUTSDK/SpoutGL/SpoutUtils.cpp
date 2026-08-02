@@ -284,7 +284,7 @@
 				   Update StartTiming/EndTiming
 		21.07.26 - TDN_HYPERLINK_CLICKED
 				   Look for - "noclose" for the dialog to remain open
-				   The application url includes "noclose" and is of the form
+				   The application url includes "?noclose" and is of the form
 				   <a href=\"https://github.com?noclose\">https://github.com</a>
 
 */
