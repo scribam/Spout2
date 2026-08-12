@@ -116,7 +116,9 @@
 	16.07.26 - move using namespace spoututils from header to class file
 	30.07.26 - readSenderSetFromBuffer -
 			   Cast name to unsigned char to allow for non-ASCII characters
-	
+	12.08.26 - Change to PtrToUint/UintToPtr for SetSenderInfo/GetSenderInfo
+			   instead of HandleToLong/LongToHandle
+
 	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	Copyright (c) 2014-2026, Lynn Jarvis. All rights reserved.
 
@@ -584,13 +586,8 @@ bool spoutSenderNames::GetSenderInfo(const char* sendername, unsigned int &width
 	if(getSharedInfo(sendername, &info)) {
 		width		  = (unsigned int)info.width;
 		height		  = (unsigned int)info.height;
-#if defined _M_X64 || defined _M_ARM64
-		dxShareHandle = (HANDLE)(LongToHandle((long)info.shareHandle));
-#else
-		dxShareHandle = (HANDLE)info.shareHandle;
-#endif
+		dxShareHandle = (HANDLE)UIntToPtr(info.shareHandle);
 		dwFormat      = info.format;
-
 		return true;
 	}
 	return false;
@@ -624,13 +621,8 @@ bool spoutSenderNames::SetSenderInfo(const char* sendername, unsigned int width,
 		
 	info.width       = (uint32_t)width;
 	info.height      = (uint32_t)height;
-#ifdef _M_X64
-	info.shareHandle = (uint32_t)(HandleToLong(dxShareHandle));
-#else
-	info.shareHandle = (uint32_t)dxShareHandle;
-#endif
-	info.format      = (uint32_t)dwFormat;
-	
+	info.shareHandle = PtrToUint(dxShareHandle);
+
 	// Texture usage - unused
 	info.usage = 0;
 
