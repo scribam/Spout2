@@ -92,6 +92,8 @@
 			   instead of min in rgba2rgbResample - PR #139
 	04.07.26 - Include <immintrin.h> instead of both
 			   <emmintrin.h> and <tmmintrin.h>
+	12.08.26 - memcpy_sse2 - braces around initial pointer check
+			   To avoid "misleading indentation" warning.
 
 */
 
@@ -301,8 +303,9 @@ void spoutCopy::ClearAlpha(unsigned char* src, unsigned int width, unsigned int 
 // SSE2 version of memcpy
 void spoutCopy::memcpy_sse2(void* dst, const void* src, size_t size) const
 {
-    if (!dst || !src || size == 0)
-        return;
+	if (!dst || !src || size == 0) {
+		return;
+	}
 
 	char* pDst = reinterpret_cast<char*>(dst);
     const char* pSrc = reinterpret_cast<const char*>(src);
