@@ -48,6 +48,18 @@
 #else
 #include <emmintrin.h> // for SSE2
 #include <tmmintrin.h> // for SSSE3
+#if defined(__GNUC__) || (defined(__clang__) && defined(_MSC_VER))
+#define SPOUT_TARGET_SSE2 __attribute__((__target__("sse2")))
+#define SPOUT_TARGET_SSSE3 __attribute__((__target__("ssse3")))
+#endif
+#endif
+
+#ifndef SPOUT_TARGET_SSE2
+#define SPOUT_TARGET_SSE2
+#endif
+
+#ifndef SPOUT_TARGET_SSSE3
+#define SPOUT_TARGET_SSSE3
 #endif
 #include <cmath> // For compatibility with Clang. PR#81
 #include <stdint.h> // for _uint32 etc
