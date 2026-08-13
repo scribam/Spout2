@@ -286,6 +286,7 @@
 				   Look for - "noclose" for the dialog to remain open
 				   The application url includes "?noclose" and is of the form
 				   <a href=\"https://github.com?noclose\">https://github.com</a>
+		13.08.26 - Remove "?noclose" from the url in TDN_HYPERLINK_CLICKED
 
 */
 
@@ -3015,24 +3016,35 @@ namespace spoututils {
 			//   TDN_HYPERLINK_CLICKED indicates that a hyperlink has been selected.
 			//   lParam - Pointer to a wide-character string containing the URL of the hyperlink.
 			if (uNotification == TDN_HYPERLINK_CLICKED) {
-				
+
+				bool bNoClose = false;
+				// Look for - "?noclose" for the dialog to remain open
+				// Close the dialog if not found
+				std::wstring wstr(reinterpret_cast<LPCWSTR>(lParam));
+				size_t pos = wstr.find(L"?noclose");
+				if (pos != std::wstring::npos) {
+					// Found ?noclose - keep the dialog open
+					bNoClose = true;
+					// Remove "?noclose" from the url
+					wstr = wstr.substr(0, pos);
+				}
+
 				SHELLEXECUTEINFOW sei{};
 				sei.cbSize = sizeof(sei);
 				sei.hwnd = NULL;
 				sei.lpVerb = L"open";
-				sei.lpFile = (LPCWSTR)lParam;
+				sei.lpFile = (LPCWSTR)wstr.c_str();
 				sei.nShow = SW_SHOWNORMAL;
 				if (!ShellExecuteExW(&sei)) {
 					return S_FALSE;
 				}
 
-				// Look for - "noclose" for the dialog to remain open
-				std::wstring wstr(reinterpret_cast<LPCWSTR>(lParam));
-				if (wstr.find(L"noclose") == std::wstring::npos) {
-					// Close dialog if not found
+				if (!bNoClose) {
+					// Close dialog if "?noclose" not found
 					SendMessage(hwnd, TDM_CLICK_BUTTON, IDOK, 0);
 				}
-				// Found "noclose" - leave dialog open
+				// Found "?noclose" - leave dialog open
+
 			}
 #endif
 			return S_OK;
