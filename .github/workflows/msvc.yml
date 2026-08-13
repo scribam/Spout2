@@ -9,11 +9,12 @@ jobs:
       fail-fast: false
       matrix:
         arch: [ Win32, x64, ARM64 ]
+        toolset: [ v145, ClangCL ]
     steps:
       - uses: actions/checkout@v7
       - name: Configure CMake
         run: |
           $SPOUT_BUILD_ARM = ("${{ matrix.arch }}" -eq "ARM64") ? 'ON' : 'OFF'
-          cmake -B build -A ${{ matrix.arch }} -DSPOUT_BUILD_SPOUTDX=ON -DSPOUT_BUILD_ARM="$SPOUT_BUILD_ARM"
+          cmake -B build -A ${{ matrix.arch }} -T ${{ matrix.toolset }} -DSPOUT_BUILD_SPOUTDX=ON -DSPOUT_BUILD_ARM="$SPOUT_BUILD_ARM"
       - name: Build
         run: cmake --build build

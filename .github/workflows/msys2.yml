@@ -4,11 +4,16 @@ on: [ push, pull_request ]
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        sys: [ mingw32, mingw64, ucrt64, clang64 ]
+        include:
+          - { os: windows-latest, sys: mingw32 }
+          - { os: windows-latest, sys: mingw64 }
+          - { os: windows-latest, sys: ucrt64 }
+          - { os: windows-latest, sys: clang64 }
+          - { os: windows-11-arm, sys: clangarm64 }
     defaults:
       run:
         shell: msys2 {0}
@@ -17,11 +22,14 @@ jobs:
         with:
           msystem: ${{ matrix.sys }}
           update: true
+          install: make
           pacboy:
             cmake:p
             toolchain:p
       - uses: actions/checkout@v7
       - name: Configure CMake
-        run: cmake -B build -DSPOUT_BUILD_SPOUTDX=ON
+        run: |
+          SPOUT_BUILD_ARM=$([ ${{ matrix.os }} == "windows-11-arm" ] && echo "ON" || echo "OFF")
+          cmake -B build -DSPOUT_BUILD_SPOUTDX=ON -DSPOUT_BUILD_ARM=$SPOUT_BUILD_ARM
       - name: Build
         run: cmake --build build
