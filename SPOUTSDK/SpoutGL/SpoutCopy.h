@@ -56,6 +56,18 @@
 // Header for x86 SIMD intrinsics
 // SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2
 #include <immintrin.h>
+#if defined(__GNUC__) || (defined(__clang__) && defined(_MSC_VER))
+#define SPOUT_TARGET_SSE2 __attribute__((__target__("sse2")))
+#define SPOUT_TARGET_SSSE3 __attribute__((__target__("ssse3")))
+#endif
+#endif
+
+#ifndef SPOUT_TARGET_SSE2
+#define SPOUT_TARGET_SSE2
+#endif
+
+#ifndef SPOUT_TARGET_SSSE3
+#define SPOUT_TARGET_SSSE3
 #endif
 
 
@@ -156,7 +168,7 @@ class SPOUT_DLLEXP spoutCopy {
 		// SSE3 function
 		//
 
-		// RGBA to RGB/BGR with source line pitch 
+		// RGBA to RGB/BGR with source line pitch
 		void rgba_to_rgb_sse3(const void* rgba_source, void* rgb_dest,
 			unsigned int width, unsigned int height,
 			unsigned int rgba_pitch, // line byte pitch
